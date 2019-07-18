@@ -21,13 +21,12 @@ set /a tsc=0
 set line=
 FOR /F "usebackq tokens=1,2,3* delims=" %%i IN (`curl -ks %url%`) DO (
   set line=%%i
+  IF NOT DEFINED line goto next
   if "!dc!"=="0" (
     if "!line:~0,1!" NEQ "#" (
       if "!line:~-3!" NEQ ".ts" (
-	     if defined line (
-	      call :getFNts "!line!"
-	      set line=!getFNts!
-		)
+	    call :getFNts "!line!"
+	    set line=!getFNts!
 	  )
 	)
     echo !line:/=_!>>!m3u8!
@@ -38,10 +37,8 @@ FOR /F "usebackq tokens=1,2,3* delims=" %%i IN (`curl -ks %url%`) DO (
   )
   if "!line:~0,1!" NEQ "#" (
     if "!line:~-3!" NEQ ".ts" (
-	  if defined line (
-	    call :getFNts "!line!"
-	    set line=!getFNts!
-	  )
+	  call :getFNts "!line!"
+	  set line=!getFNts!
 	)
 	set outfn=!dir!\!line:/=_!
 	IF NOT EXIST "!outfn!" (
@@ -66,6 +63,7 @@ FOR /F "usebackq tokens=1,2,3* delims=" %%i IN (`curl -ks %url%`) DO (
   )
 )
 
+:next
 IF NOT DEFINED line (
   if "!dc!"=="1" echo #EXT-X-ENDLIST>>!m3u8!
   goto end
@@ -91,7 +89,7 @@ set BaseURL=!BaseURL::/=://!
 exit /b
 ::=================================================================================================
 :getFNts
-FOR /F "usebackq delims=" %%i IN (`echo "%~n1"^|grep -Eo "(.*)\.ts"`) DO (
+FOR /F "usebackq delims=" %%i IN (`echo "%~1"^|grep -Eo "(.*)\.ts"`) DO (
   set getFNts=%%i
 )
 set getFNts=!getFNts:"=!
