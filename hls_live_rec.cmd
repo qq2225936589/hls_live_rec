@@ -24,49 +24,49 @@ set line=
 FOR /F "usebackq delims=" %%i IN (`curl -ks %url%`) DO (
   set line=%%i
   if "!line!"=="stream not found" (
-    set /a snfc=!snfc!+1	
+    set /a snfc=!snfc!+1    
     echo Stream not found
-	if !snfc! GEQ 24 (
+      if !snfc! GEQ 24 (
       set line=
-	  set /a snfc=0
+      set /a snfc=0
       goto next
-	)
+    )
   )
   IF NOT DEFINED line goto next
   if "!dc!"=="0" (
     if "!line:~0,1!" NEQ "#" (
       if "!line:~-3!" NEQ ".ts" (
-	    call :getFNts "!line!"
-	    set line=!getFNts!
-	  )
-	)
+        call :getFNts "!line!"
+        set line=!getFNts!
+      )
+    )
     echo !line:/=_!>>!m3u8!
-	echo !line!
+    echo !line!
   )
   if "!line:~0,7!"=="#EXTINF" (
-	if "!dc!"=="1" set EXTINF=!line!
+    if "!dc!"=="1" set EXTINF=!line!
   )
   if "!line:~0,1!" NEQ "#" (
     if "!line:~-3!" NEQ ".ts" (
-	  call :getFNts "!line!"
-	  set line=!getFNts!
-	)
-	set outfn=!dir!\!line:/=_!
-	IF NOT EXIST "!outfn!" (
+      call :getFNts "!line!"
+      set line=!getFNts!
+    )
+    set outfn=!dir!\!line:/=_!
+    IF NOT EXIST "!outfn!" (
       set tsurl=!BaseURL!!line!
-	  if "!dc!"=="1" (
-	    echo !EXTINF!
-	    echo !line!
-	    echo !EXTINF!>>!m3u8!
-	    echo !line:/=_!>>!m3u8!
-	  )
-	  type NUL>"!outfn!"
-	  set /a tsc=!tsc!+1
-	  set t=!time::=!
+      if "!dc!"=="1" (
+        echo !EXTINF!
+        echo !line!
+        echo !EXTINF!>>!m3u8!
+        echo !line:/=_!>>!m3u8!
+      )
+      type NUL>"!outfn!"
+      set /a tsc=!tsc!+1
+      set t=!time::=!
       set t=!t: =0!
-	  title !tsc! !dir:~16! !t:~0,6!
-	  start /b curl -ks "!tsurl!" -o "!outfn!"
-	)
+      title !tsc! !dir:~16! !t:~0,6!
+      start /b curl -ks "!tsurl!" -o "!outfn!"
+    )
   )
   if "!line!"=="#EXT-X-ENDLIST" (
     if "!dc!"=="1" echo !line!>>!m3u8!
