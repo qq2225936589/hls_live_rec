@@ -19,7 +19,7 @@ set /a dc=0
 set /a tsc=0
 :loop
 set line=
-FOR /F "usebackq tokens=1,2,3* delims=" %%i IN (`curl -ks %url%`) DO (
+FOR /F "usebackq delims=" %%i IN (`curl -ks %url%`) DO (
   set line=%%i
   IF NOT DEFINED line goto next
   if "!dc!"=="0" (
