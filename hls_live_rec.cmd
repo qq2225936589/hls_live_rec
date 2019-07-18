@@ -24,8 +24,10 @@ FOR /F "usebackq tokens=1,2,3* delims=" %%i IN (`curl -ks %url%`) DO (
   if "!dc!"=="0" (
     if "!line:~0,1!" NEQ "#" (
       if "!line:~-3!" NEQ ".ts" (
-	    call :getFNts "!line!"
-	    set line=!getFNts!
+	     if defined line (
+	      call :getFNts "!line!"
+	      set line=!getFNts!
+		)
 	  )
 	)
     echo !line:/=_!>>!m3u8!
@@ -36,8 +38,10 @@ FOR /F "usebackq tokens=1,2,3* delims=" %%i IN (`curl -ks %url%`) DO (
   )
   if "!line:~0,1!" NEQ "#" (
     if "!line:~-3!" NEQ ".ts" (
-	  call :getFNts "!line!"
-	  set line=!getFNts!
+	  if defined line (
+	    call :getFNts "!line!"
+	    set line=!getFNts!
+	  )
 	)
 	set outfn=!dir!\!line:/=_!
 	IF NOT EXIST "!outfn!" (
@@ -52,7 +56,7 @@ FOR /F "usebackq tokens=1,2,3* delims=" %%i IN (`curl -ks %url%`) DO (
 	  set /a tsc=!tsc!+1
 	  set t=!time::=!
       set t=!t: =0!
-	  title !tsc! !dir! !t:~0,6!
+	  title !tsc! !dir:~16! !t:~0,6!
 	  start /b curl -ks "!tsurl!" -o "!outfn!"
 	)
   )
