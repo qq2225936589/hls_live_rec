@@ -12,6 +12,7 @@ set t=%t: =0%
 set dir=!name!_%date:-=%-%t:~0,6%
 md !dir!
 set m3u8=!dir!\!m3u8!
+echo !url!>!dir!\_url.txt
 ::=================================================================================================
 echo Press Q to quit
 type NUL>!m3u8!
@@ -21,6 +22,11 @@ set /a tsc=0
 set line=
 FOR /F "usebackq delims=" %%i IN (`curl -ks %url%`) DO (
   set line=%%i
+  if "!line!"=="stream not found" (
+    echo stream not found
+    set line=
+    goto next
+  )
   IF NOT DEFINED line goto next
   if "!dc!"=="0" (
     if "!line:~0,1!" NEQ "#" (
