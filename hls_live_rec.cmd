@@ -16,6 +16,7 @@ set m3u8=!dir!\!m3u8!
 echo Press Q to quit
 type NUL>!m3u8!
 set /a dc=0
+set /a tsc=0
 :loop
 set line=
 FOR /F "usebackq tokens=1,2,3* delims=" %%i IN (`curl -ks %url%`) DO (
@@ -27,7 +28,7 @@ FOR /F "usebackq tokens=1,2,3* delims=" %%i IN (`curl -ks %url%`) DO (
 	    set line=!getFNts!
 	  )
 	)
-    echo !line!>>!m3u8!
+    echo !line:/=_!>>!m3u8!
 	echo !line!
   )
   if "!line:~0,7!"=="#EXTINF" (
@@ -38,16 +39,21 @@ FOR /F "usebackq tokens=1,2,3* delims=" %%i IN (`curl -ks %url%`) DO (
 	  call :getFNts "!line!"
 	  set line=!getFNts!
 	)
-	IF NOT EXIST "!dir!\!line!" (
+	set outfn=!dir!\!line:/=_!
+	IF NOT EXIST "!outfn!" (
       set tsurl=!BaseURL!!line!
 	  if "!dc!"=="1" (
 	    echo !EXTINF!
 	    echo !line!
 	    echo !EXTINF!>>!m3u8!
-	    echo !line!>>!m3u8!
+	    echo !line:/=_!>>!m3u8!
 	  )
-	  type NUL>"!dir!\!line!"
-	  start /b curl -ks "!tsurl!" -o "!dir!\!line!"
+	  type NUL>"!outfn!"
+	  set /a tsc=!tsc!+1
+	  set t=!time::=!
+      set t=!t: =0!
+	  title !tsc! !dir! !t:~0,6!
+	  start /b curl -ks "!tsurl!" -o "!outfn!"
 	)
   )
   if "!line!"=="#EXT-X-ENDLIST" (
