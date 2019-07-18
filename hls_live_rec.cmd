@@ -11,7 +11,7 @@ set t=%time::=%
 set t=%t: =0%
 set dir=!name!_%date:-=%-%t:~0,6%
 md !dir!
-set m3u8=!dir!\_index.m3u8
+set m3u8=!dir!\!m3u8!
 ::=================================================================================================
 echo Press Q to quit
 type NUL>!m3u8!
@@ -22,8 +22,10 @@ FOR /F "usebackq tokens=1,2,3* delims=" %%i IN (`curl -ks %url%`) DO (
   set line=%%i
   if "!dc!"=="0" (
     if "!line:~0,1!" NEQ "#" (
-	  call :getFNts "!line!"
-	  set line=!fn!  
+      if "!line:~-3!" NEQ ".ts" (
+	    call :getFNts "!line!"
+	    set line=!getFNts!
+	  )
 	)
     echo !line!>>!m3u8!
 	echo !line!
@@ -32,8 +34,10 @@ FOR /F "usebackq tokens=1,2,3* delims=" %%i IN (`curl -ks %url%`) DO (
 	if "!dc!"=="1" set EXTINF=!line!
   )
   if "!line:~0,1!" NEQ "#" (
-    call :getFNts "!line!"
-	set line=!fn!
+    if "!line:~-3!" NEQ ".ts" (
+	  call :getFNts "!line!"
+	  set line=!getFNts!
+	)
 	IF NOT EXIST "!dir!\!line!" (
       set tsurl=!BaseURL!!line!
 	  if "!dc!"=="1" (
@@ -78,7 +82,7 @@ exit /b
 ::=================================================================================================
 :getFNts
 FOR /F "usebackq delims=" %%i IN (`echo "%~n1"^|grep -Eo "(.*)\.ts"`) DO (
-  set fn=%%i
+  set getFNts=%%i
 )
-set fn=%fn:"=%
+set getFNts=!getFNts:"=!
 exit /b
