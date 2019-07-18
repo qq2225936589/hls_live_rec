@@ -18,14 +18,19 @@ echo Press Q to quit
 type NUL>!m3u8!
 set /a dc=0
 set /a tsc=0
+set /a snfc=0
 :loop
 set line=
 FOR /F "usebackq delims=" %%i IN (`curl -ks %url%`) DO (
   set line=%%i
   if "!line!"=="stream not found" (
-    echo stream not found
-    set line=
-    goto next
+    set /a snfc=!snfc!+1	
+    echo Stream not found
+	if !snfc! GEQ 24 (
+      set line=
+	  set /a snfc=0
+      goto next
+	)
   )
   IF NOT DEFINED line goto next
   if "!dc!"=="0" (
