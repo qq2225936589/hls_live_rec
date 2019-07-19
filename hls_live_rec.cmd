@@ -29,6 +29,7 @@ set /a snfc=0
 set line=
 FOR /F "usebackq delims=" %%i IN (`curl -ks %url%`) DO (
   set line=%%i
+  if "!line:~0,1!"=="<" goto next
   if "!line!"=="stream not found" (
     set /a snfc=!snfc!+1    
     echo Stream not found [!snfc!]
