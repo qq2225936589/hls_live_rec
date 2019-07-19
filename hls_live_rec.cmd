@@ -10,8 +10,12 @@ echo %BaseURL%
 set t=%time::=%
 set t=%t: =0%
 set dir=!name!
-IF DEFINED name set m3u8=_!name!.m3u8
-IF NOT DEFINED dir dir=%date:-=%-%t:~0,6%
+IF DEFINED name (
+  set m3u8=_!name!_%date:-=%-%t:~0,6%.m3u8
+  set dir=!name!_%date:-=%-%t:~0,6%
+) else (
+  set dir=%date:-=%-%t:~0,6%
+)
 md !dir!
 set m3u8=!dir!\!m3u8!
 echo !url!>!dir!\_url.txt
@@ -66,7 +70,7 @@ FOR /F "usebackq delims=" %%i IN (`curl -ks %url%`) DO (
       set /a tsc=!tsc!+1
       set t=!time::=!
       set t=!t: =0!
-      title !tsc! !dir:~16! !t:~0,6!
+      title !tsc! !dir! !t:~0,6!
       start /b curl -ks "!tsurl!" -o "!outfn!"
       set /a snfc=0
     )
@@ -83,7 +87,7 @@ IF NOT DEFINED line (
   goto end
 )
 ::timeout 1 1>nul 2>nul
-choice.exe /c qc /n /t 2 /d c /m "Press Q to quit" 1>nul 2>nul
+choice.exe /c qc /n /t 1 /d c /m "Press Q to quit" 1>nul 2>nul
 if %errorlevel%==1 (
   if "!dc!"=="1" echo #EXT-X-ENDLIST>>!m3u8!
   goto end
