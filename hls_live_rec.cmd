@@ -66,9 +66,9 @@ FOR /F "usebackq delims=" %%i IN (`curl -ks %url%`) DO (
       set /a tsc=!tsc!+1
       set t=!time::=!
       set t=!t: =0!
-      title !tsc! !dir! !t:~0,6!
+      title !tsc! !dir:~16! !t:~0,6!
       start /b curl -ks "!tsurl!" -o "!outfn!"
-	  set /a snfc=0
+      set /a snfc=0
     )
   )
   if "!line!"=="#EXT-X-ENDLIST" (
